@@ -3,13 +3,17 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import axios from "axios";
 import type { ItemType } from "../../../type.d.ts";
+import { CiEdit } from "react-icons/ci";
+
 
 const Page = () => {
   const { id } = useParams();
   const [fetchedData, setFetchedData] = useState<ItemType[]>([]);
+  const [itemData,setitemData] = useState<any|undefined>()
   const [loader, setLoader] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [showForm,setshowForm] = useState<boolean>(false);
+  const [showUpdateForm,setshowUpdateForm] = useState<boolean>(false)
   const [commodity,setcommodidty] = useState<string>("")
   const [price,setprice] = useState<number>()
   const [stock,setstock] = useState<number>()
@@ -43,7 +47,6 @@ const Page = () => {
   }
 
   const handleDelete =async (id:string)=>{
-
     try {
       await axios.get(`http://localhost:3001/item/delete/${id}`)
       setLoader(false)
@@ -51,6 +54,24 @@ const Page = () => {
       console.error("error while deleting item")
     }
   }
+
+  const handleChange=async (item:ItemType)=>{
+    setitemData(item)
+    setshowUpdateForm(true)
+  }
+
+  const handleUpdate =async ()=>{
+    setshowUpdateForm(false)
+    console.log(itemData)
+    try {
+      await axios.put(`http://localhost:3001/item/update/${itemData?._id}`,itemData)
+      setLoader(false)
+    } catch (error) {
+      console.log("error : ",error)
+    }
+  }
+
+
 
   if (error) {
 
@@ -88,7 +109,10 @@ const Page = () => {
                       <td className="py-2 px-4 border-b border-gray-200 text-center">{item.name}</td>
                       <td className="py-2 px-4 border-b border-gray-200 text-center">{item.price}</td>
                       <td className="py-2 px-4 border-b border-gray-200 text-center">{item.stock}</td>
-                      <div onClick={()=>handleDelete(item._id)} className="cursor-pointer">x</div>
+                      <div className="flex flex-row items-center justify-center gap-4">
+                        <div onClick={()=>handleDelete(item._id)} className="cursor-pointer">x</div>
+                        <div onClick={()=>{handleChange(item)}}><CiEdit /></div>
+                      </div>
                     </tr>
                   ))}
                 </tbody>
@@ -115,6 +139,27 @@ const Page = () => {
                 </div>
                 <div>
                   <input type="submit" className="p-2 bg-green-500 rounded-lg cursor-pointer"></input>
+                </div>
+              </form>
+            </div>) : ""
+          }
+          {showUpdateForm ?
+            (<div>
+              <form className="w-2/4 flex flex-col gap-3" onSubmit={handleUpdate}>
+                <div className="flex flex-col gap-2">
+                  <label>Commodity</label>
+                  <input type="text" placeholder="Enter commodity" className="p-2 border-2" value={itemData?.name} onChange={(e:any)=>setitemData({...itemData,name:e.target.value})}></input>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label>Price</label>
+                  <input type="number" placeholder="Enter Price" className="p-2 border-2" value={itemData?.price} onChange={(e:any)=>setitemData({...itemData,price:e.target.value})}></input>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label>Stock</label>
+                  <input type="number" placeholder="Enter Stock" className="p-2 border-2" value={itemData?.stock} onChange={(e:any)=>setitemData({...itemData,stock:e.target.value})}></input>
+                </div>
+                <div>
+                  <button type="submit" className="p-2 bg-green-500 rounded-lg cursor-pointer"><span>Update</span></button>
                 </div>
               </form>
             </div>) : ""

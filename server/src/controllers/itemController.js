@@ -41,4 +41,18 @@ const deleteItems = async(req,res)=>{
       }
 }
 
-module.exports = {createItem,getItems,deleteItems}
+const updateItem =async (req,res)=>{
+    console.log(req.body)
+    try {
+        const uptItem = await Item.findByIdAndUpdate(
+            req.params.itemid,
+            req.body,
+            {new: true}
+        );
+        res.status(200).json({error:false,message:"items updated"})
+    } catch (error) {
+        res.status(500).json({message:"Item is not updated"})
+    }
+}
+
+module.exports = {createItem,getItems,deleteItems,updateItem}
