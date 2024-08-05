@@ -62,7 +62,6 @@ const Page = () => {
 
   const handleUpdate =async ()=>{
     setshowUpdateForm(false)
-    console.log(itemData)
     try {
       await axios.put(`http://localhost:3001/item/update/${itemData?._id}`,itemData)
       setLoader(false)

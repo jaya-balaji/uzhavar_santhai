@@ -15,7 +15,6 @@ const page = () => {
     e.preventDefault()
      await axios.post('http://localhost:3001/admin/authAdminData',{email:email,password:password})   
     .then(res => {
-        console.log(res.data)
         if(!res.data.err){
           router.push(`/admindashboard/admin/${res.data.id}`);
         } else{

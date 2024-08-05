@@ -1,4 +1,5 @@
 const Item = require("../models/itemSchema")
+const jwt = require('jsonwebtoken');
 
 const createItem = (req,res) =>{
     try {
@@ -18,9 +19,22 @@ const createItem = (req,res) =>{
     }
 }
 
+const authenticateToken = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if (token == null) return res.status(401).json({ message: 'No token provided' });
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+        if (err) return res.status(403).json({ message: 'Forbidden' });
+        req.params.itemData = user.itemData; 
+        next(); 
+    });
+};
+
 const getItems = async(req,res)=>{
     try {
-        const items = await Item.find({creator: req.params.itemid}); // Fetch all items using Mongoose
+        const items = await Item.find({creator: req.params.itemData}); // Fetch all items using Mongoose
         res.status(200).send(items);
       } catch (error) {
         console.error('Error fetching items:', error); // Log the error
@@ -55,4 +69,4 @@ const updateItem =async (req,res)=>{
     }
 }
 
-module.exports = {createItem,getItems,deleteItems,updateItem}
+module.exports = {createItem,getItems,deleteItems,updateItem,authenticateToken}
