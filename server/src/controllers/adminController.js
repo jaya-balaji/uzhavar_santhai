@@ -66,6 +66,7 @@ const loginAdmin = async (req, res) => {
         }
 
         const token = jwt.sign({ id: user._id }, 'pvQCvCYknO8DpRi', { expiresIn: '1h' });
+        console.log(token)
 
         res.status(200).json({ message: 'Login successful', error: false, id: token });
     } catch (error) {

@@ -2,6 +2,7 @@ const Item = require("../models/itemSchema")
 const jwt = require('jsonwebtoken');
 
 const createItem = (req,res) =>{
+    console.log(req.body)
     try {
     Item.create(req.body)
         res.status(200)
@@ -19,22 +20,10 @@ const createItem = (req,res) =>{
     }
 }
 
-const authenticateToken = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
-
-    if (token == null) return res.status(401).json({ message: 'No token provided' });
-
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-        if (err) return res.status(403).json({ message: 'Forbidden' });
-        req.params.itemData = user.itemData; 
-        next(); 
-    });
-};
 
 const getItems = async(req,res)=>{
     try {
-        const items = await Item.find({creator: req.params.itemData}); // Fetch all items using Mongoose
+        const items = await Item.find({creator: req.body.creator}); // Fetch all items using Mongoose
         res.status(200).send(items);
       } catch (error) {
         console.error('Error fetching items:', error); // Log the error
@@ -43,8 +32,9 @@ const getItems = async(req,res)=>{
 }
 
 const deleteItems = async(req,res)=>{
+    console.log("ON DELETE BLOCK : ",req.headers.id)
     try {
-        const items = await Item.findByIdAndDelete(req.params.itemid); // Fetch all items using Mongoose
+        const items = await Item.findByIdAndDelete(req.headers.id); // Fetch all items using Mongoose
         res.status(200).send({
             error:false,
             message:"item deleted"
@@ -56,10 +46,10 @@ const deleteItems = async(req,res)=>{
 }
 
 const updateItem =async (req,res)=>{
-    console.log(req.body)
+    console.log("ON UPDATE BLOCK",req.headers.id)
     try {
         const uptItem = await Item.findByIdAndUpdate(
-            req.params.itemid,
+            req.headers.id,
             req.body,
             {new: true}
         );
@@ -69,4 +59,4 @@ const updateItem =async (req,res)=>{
     }
 }
 
-module.exports = {createItem,getItems,deleteItems,updateItem,authenticateToken}
+module.exports = {createItem,getItems,deleteItems,updateItem}
