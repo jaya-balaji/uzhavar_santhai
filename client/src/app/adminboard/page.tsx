@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import axios from "axios";
-import type { ItemType } from "../../../type.d.ts";
+import type { ItemType } from "../../type.d.ts";
 import { CiEdit } from "react-icons/ci";
 
 
@@ -17,11 +17,19 @@ const Page = () => {
   const [commodity,setcommodidty] = useState<string>("")
   const [price,setprice] = useState<number>()
   const [stock,setstock] = useState<number>()
+  
+
 
   useEffect(() => {
     const fetchData = async () => {
+        const token = localStorage.getItem('token')
+        console.log(token)
       try {
-        const res = await axios.get<ItemType[]>(`http://localhost:3001/item/get/${id[1]}`);
+        const res = await axios.get<ItemType[]>(`http://localhost:3001/item/get`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
         console.log(res)
         setFetchedData(res.data);
         setLoader(true);
@@ -34,8 +42,22 @@ const Page = () => {
 
   const addItem = async (e:any) => {
     e.preventDefault()
+    const token = localStorage.getItem('token')
     try {
-      await axios.post(`http://localhost:3001/item/create`,{name:commodity,price:price,stock:stock,creator:id[1]})
+        const response = await axios.post(
+            `http://localhost:3001/item/create`,
+            {
+                name: commodity,
+                price: price,
+                stock: stock,
+                creator:""
+            },
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            }
+        )
       .then(()=>{
         setLoader(false)
         setshowForm(false)
@@ -47,8 +69,14 @@ const Page = () => {
   }
 
   const handleDelete =async (id:string)=>{
+    const token = localStorage.getItem('token')
     try {
-      await axios.get(`http://localhost:3001/item/delete/${id}`)
+      await axios.get(`http://localhost:3001/item/delete`,{
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'id': id
+        }
+    })
       setLoader(false)
     } catch (error) {
       console.error("error while deleting item")
@@ -57,13 +85,20 @@ const Page = () => {
 
   const handleChange=async (item:ItemType)=>{
     setitemData(item)
+    console.log(itemData)
     setshowUpdateForm(true)
   }
 
   const handleUpdate =async ()=>{
     setshowUpdateForm(false)
+    const token = localStorage.getItem('token')
     try {
-      await axios.put(`http://localhost:3001/item/update/${itemData?._id}`,itemData)
+      await axios.put(`http://localhost:3001/item/update`,{
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'id':itemData._id
+        }
+    },itemData)
       setLoader(false)
     } catch (error) {
       console.log("error : ",error)

@@ -13,10 +13,11 @@ const page = () => {
 
   const login = async (e : any) =>{
     e.preventDefault()
-     await axios.post('http://localhost:3001/admin/authAdminData',{email:email,password:password})   
+     await axios.post('http://localhost:3001/admin/authAdminData',{email:email,password:password}) 
     .then(res => {
+      localStorage.setItem('token',res.data.id)
         if(!res.data.err){
-          router.push(`/admindashboard/admin/${res.data.id}`);
+          router.push(`/adminboard`);
         } else{
           console.log("Invalid Credential")
         }
