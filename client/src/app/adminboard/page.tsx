@@ -89,7 +89,7 @@ const Page = () => {
     setshowUpdateForm(true)
   }
 
-  const handleUpdate =async ()=>{
+  const handleUpdate =async ()=>{ 
     setshowUpdateForm(false)
     const token = localStorage.getItem('token')
     try {
