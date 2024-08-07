@@ -1,10 +1,10 @@
 const router = require("express").Router()
 const {createItem,getItems,deleteItems,updateItem} = require("../controllers/itemController")
-const {authenticateToken,authenticateTokenOnDelete} = require("../middleware/jwtAuth")
+const {authenticateToken,authenticateTokenOnUpdateandDelete} = require("../middleware/jwtAuth")
 
 router.get('/get',authenticateToken,getItems)
 router.post('/create',authenticateToken,createItem)
-router.get('/delete',authenticateTokenOnDelete,deleteItems)
-router.put('/update',authenticateTokenOnDelete,updateItem)
+router.get('/delete',authenticateTokenOnUpdateandDelete,deleteItems)
+router.put('/update',authenticateTokenOnUpdateandDelete,updateItem)
 
 module.exports = router

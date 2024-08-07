@@ -23,7 +23,6 @@ const Page = () => {
   useEffect(() => {
     const fetchData = async () => {
         const token = localStorage.getItem('token')
-        console.log(token)
       try {
         const res = await axios.get<ItemType[]>(`http://localhost:3001/item/get`, {
             headers: {
@@ -85,20 +84,25 @@ const Page = () => {
 
   const handleChange=async (item:ItemType)=>{
     setitemData(item)
-    console.log(itemData)
     setshowUpdateForm(true)
   }
 
-  const handleUpdate =async ()=>{ 
+  const handleUpdate =async (e:any)=>{ 
+    e.preventDefault()
     setshowUpdateForm(false)
     const token = localStorage.getItem('token')
+    console.log(itemData.id)
     try {
       await axios.put(`http://localhost:3001/item/update`,{
+        name : itemData.name,
+        price : itemData.price,
+        stock : itemData.stock
+    },{
         headers: {
             'Authorization': `Bearer ${token}`,
-            'id':itemData._id
+            'id':itemData.id
         }
-    },itemData)
+    })
       setLoader(false)
     } catch (error) {
       console.log("error : ",error)
@@ -106,9 +110,7 @@ const Page = () => {
   }
 
 
-
   if (error) {
-
     return (
       <div className="flex h-screen">
       <div className="w-1/4 p-4 bg-gray-100">
@@ -139,12 +141,12 @@ const Page = () => {
                 </thead>
                 <tbody>
                   {fetchedData.map((item : ItemType) => (
-                    <tr key={item._id} className="hover:bg-gray-100">
+                    <tr key={item.id} className="hover:bg-gray-100">
                       <td className="py-2 px-4 border-b border-gray-200 text-center">{item.name}</td>
                       <td className="py-2 px-4 border-b border-gray-200 text-center">{item.price}</td>
                       <td className="py-2 px-4 border-b border-gray-200 text-center">{item.stock}</td>
                       <div className="flex flex-row items-center justify-center gap-4">
-                        <div onClick={()=>handleDelete(item._id)} className="cursor-pointer">x</div>
+                        <div onClick={()=>handleDelete(item.id)} className="cursor-pointer">x</div>
                         <div onClick={()=>{handleChange(item)}}><CiEdit /></div>
                       </div>
                     </tr>
