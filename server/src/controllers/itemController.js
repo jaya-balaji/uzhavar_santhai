@@ -21,13 +21,28 @@ const createItem = (req,res) =>{
 
 
 const getItems = async(req,res)=>{
+    let totalStock = 0
+    const fruits = ['apple','banana','pomegranate','mango']
+    let fruitsCount = 0
+    let vegetableCount = 0
+    let counts = {}
+    
     try {
         const items = await Item.find({creator: req.body.creator}); // Fetch all items using Mongoose
         const modifiedItems = items.map(item => {
+        totalStock=item.stock+totalStock
+        if(fruits.find(fruit => fruit===item.name.toLowerCase())){
+                fruitsCount = fruitsCount+item.stock
+        } else {
+                vegetableCount = vegetableCount+item.stock
+        }
         return {id:item._id,name:item.name,stock:item.stock,price:item.price}
         });
-        res.status(200).send(modifiedItems);
-        console.log(modifiedItems)
+
+        modifiedItems.sort(((a,b)=> a.price - b.price))
+        counts ={totalStock:totalStock,fCount:fruitsCount,vCount:vegetableCount}
+        const itemWithStock = {modifiedItems,counts}
+        res.status(200).send(itemWithStock);
       } catch (error) {
         console.error('Error fetching items:', error); // Log the error
         res.status(500).json({ message: 'Error fetching items', error }); // Send error response

@@ -4,3 +4,9 @@ export interface ItemType{
     stock: number,
     price: number
 }
+
+export interface counts{
+    totalStock:string,
+    fCount:string,
+    vCount:string
+}
