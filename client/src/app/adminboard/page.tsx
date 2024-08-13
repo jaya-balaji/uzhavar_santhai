@@ -10,8 +10,6 @@ import { FaShoppingBag } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { FaRupeeSign } from "react-icons/fa";
 
-// import { Player } from '@lordicon/react';
-
 const Page = () => {
   const { id } = useParams();
   const [fetchedData, setFetchedData] = useState<ItemType[]>([]);
@@ -40,7 +38,8 @@ const Page = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-        setFetchedData(res.data.modifiedItems);
+        setFetchedData(res.data.filteredItems);
+        console.log(res.data.filteredItems)
         setCounts(res.data.counts);
         setLoader(true);
       } catch (error: any) {
@@ -50,8 +49,21 @@ const Page = () => {
     fetchData();
   }, [id, loader]);
 
+  const getCurrentTime = ()=>{
+    const now = new Date();
+    const day = String(now.getDate()).padStart(2, '0');     
+    const month = String(now.getMonth() + 1).padStart(2, '0'); 
+    const year = now.getFullYear();                          
+    const hours = String(now.getHours()).padStart(2, '0');   
+    const minutes = String(now.getMinutes()).padStart(2, '0'); 
+    
+    const formattedTime = `${day}-${month}-${year} ${hours}:${minutes}`;
+    return formattedTime
+  }
+
   const addItem = async (e: any) => {
     e.preventDefault();
+    const date = getCurrentTime()
     const token = localStorage.getItem("token");
     try {
       const response = await axios
@@ -61,7 +73,7 @@ const Page = () => {
             name: itemData.name,
             price: itemData.price,
             stock: itemData.stock,
-            creator: "",
+            date:date    
           },
           {
             headers: {
@@ -102,6 +114,7 @@ const Page = () => {
   const handleUpdate = async (e: any) => {
     e.preventDefault();
     setshowUpdateForm(false);
+    const date = getCurrentTime()
     const token = localStorage.getItem("token");
     try {
       await axios.put(
@@ -110,6 +123,7 @@ const Page = () => {
           name: itemData.name,
           price: itemData.price,
           stock: itemData.stock,
+          date:date
         },
         {
           headers: {
@@ -167,12 +181,12 @@ const Page = () => {
           </div>
         </div>
         <div className="flex flex-row gap-8">
-          <div className="p-6 bg-violet-400 rounded-xl h-[25vh] w-1/3">
+          <div className="p-6 bg-violet-400 rounded-xl h-[27vh] w-1/3">
             <div className="flex flex-col gap-2">
               <div>
                 <FaShoppingBag className="scale-[150%]" />
               </div>
-              <div className="flex flex-col justify-between gap-1">
+              <div className="flex flex-col justify-between">
                 <span>Total Stock</span>
                 <span className="text-2xl font-bold">{(Counts?.totalStock)?Counts?.totalStock:0}</span>
               </div>
@@ -183,17 +197,20 @@ const Page = () => {
                 <span>
                   Vegetables : <span className="font-semibold">{(Counts?.vCount)?Counts?.vCount:0}</span>
                 </span>
+                <span>
+                  Leafy vegetables : <span className="font-semibold">{(Counts?.vCount)?Counts?.lCount:0}</span>
+                </span>
               </div>
             </div>
           </div>
-          <div className="p-6 bg-blue-400 rounded-xl h-[25vh] w-1/3">
+          <div className="p-6 bg-blue-400 rounded-xl h-[27vh] w-1/3">
             <div className="flex flex-col gap-2">
               <div>
                 <FaShoppingBag className="scale-[150%]" />
               </div>
               <div className="flex flex-col gap-1">
-                <span>Total Stock</span>
-                <span className="text-2xl font-bold">5000</span>
+                <span>Stock change</span>
+                <span className="text-2xl font-bold">{(Counts?.SCpercentage)?Counts?.SCpercentage:0}%</span>
               </div>
               <div className="flex flex-col">
                 <span>
@@ -205,7 +222,7 @@ const Page = () => {
               </div>
             </div>
           </div>
-          <div className="p-6 bg-orange-300 rounded-xl h-[25vh] w-1/3">
+          <div className="p-6 bg-orange-300 rounded-xl h-[27vh] w-1/3">
             <div className="flex flex-col gap-2">
               <div>
                 <FaShoppingBag className="scale-[150%]" />

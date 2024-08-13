@@ -9,4 +9,6 @@ export interface counts{
     totalStock:string,
     fCount:string,
     vCount:string
+    lCount:string,
+    SCpercentage: string
 }
