@@ -50,19 +50,42 @@ const createItem = async (req, res) => {
 }
 
 const getItems = async (req, res) => {
-
-    let counts = {};
-    let priceStockData = {};
-    let fruitsCount = 0;
-    let vegetableCount = 0;
-    let leafyvegetablesCounts = 0;
-    let totalStock = 0;
-
     try {
-        const items = await Item.find({ creator: req.body.creator });
+        const dateString = req.headers['x-selected-date'];
+        let responseSent = false; // Flag to track if a response has been sent       
 
+        if (dateString !== '') {
+            // Fetch items and their prices/stocks for the specific date
+            const items = await Item.find({ creator: req.body.creator });
+            const modifiedItems = await Promise.all(items.map(async (item) => {
+                const dataByDate = await getPriceStockDataByDate(item, dateString);
+                return {
+                    id: item._id,
+                    name: item.name,
+                    stock:dataByDate.stock,
+                    price:dataByDate.price
+                };
+            }));
+            
+            const filteredItems = modifiedItems.filter(item => item.stock !== 0);
+            filteredItems.sort((a, b) => a.price - b.price);
+            console.log(filteredItems)
+
+            if (!responseSent) {
+                res.status(200).json(filteredItems);
+                responseSent = true;
+                return; // Exit early to prevent further code execution
+            }
+        }
+
+        // Fetch items and compute additional metrics
+        const items = await Item.find({ creator: req.body.creator });
+        let totalStock = 0;
+        let fruitsCount = 0;
+        let vegetableCount = 0;
+        let leafyvegetablesCounts = 0;
         const modifiedItems = await Promise.all(items.map(async (item) => {
-            priceStockData = await getpriceStockData(item);
+            const priceStockData = await getpriceStockData(item);
             const stock = parseInt(priceStockData.stock, 10);
             totalStock += stock;
 
@@ -77,22 +100,21 @@ const getItems = async (req, res) => {
             return {
                 id: item._id,
                 name: item.name,
-                stock: stock,
+                stock,
                 price: priceStockData.price
             };
         }));
 
-        const filteredItems = modifiedItems.filter(item => item.stock!==0);
-        
-        if(filteredItems.length===0){
+        const filteredItems = modifiedItems.filter(item => item.stock !== 0);
 
+        if (filteredItems.length === 0) {
+            // Fetch previous price stock data if no filtered items
             await Promise.all(items.map(async (item) => {
-             getAndSetPreviousPriceStockData(item)
-            }))
+                await getAndSetPreviousPriceStockData(item);
+            }));
         }
 
         filteredItems.sort((a, b) => a.price - b.price);
-      
 
         let changeInStockPercentage = 0;
 
@@ -103,20 +125,23 @@ const getItems = async (req, res) => {
             console.error('Error evaluating stock change:', error);
         }
 
-        counts = {
-            totalStock: totalStock,
+        const counts = {
+            totalStock,
             fCount: fruitsCount,
             vCount: vegetableCount,
             lCount: leafyvegetablesCounts,
             SCpercentage: changeInStockPercentage
         };
 
-        const itemWithStock = { filteredItems, counts };
-
-        res.status(200).send(itemWithStock);
+        if (!responseSent) {
+            const itemWithStock = { filteredItems, counts };
+            res.status(200).json(itemWithStock);
+        }
     } catch (error) {
         console.error('Error fetching items:', error); // Log the error
-        res.status(500).json({ message: 'Error fetching items', error }); // Send error response
+        if (!responseSent) {
+            res.status(500).json({ message: 'Error fetching items', error }); // Send error response
+        }
     }
 };
 
@@ -142,9 +167,9 @@ const getpriceStockData = async (item) => {
         // Convert 'dd-mm-yyyy hh:mm' to 'yyyy-mm-ddThh:mm' for Date parsing
         const dateA = new Date(a.date.split(' ')[0].split('-').reverse().join('-') + 'T' + a.date.split(' ')[1]).getTime();
         const dateB = new Date(b.date.split(' ')[0].split('-').reverse().join('-') + 'T' + b.date.split(' ')[1]).getTime();
-      
+
         return dateB - dateA; // Sort in descending order (most recent first)
-      });
+    });
     // The first item in the sorted array is the most recent
     const latestData = todayData[0];
 
@@ -182,6 +207,39 @@ const getPreviousPriceStockData = async (item) => {
 
     return { stock: latestYesterdayData.stock, price: latestYesterdayData.price };
 };
+
+const getPriceStockDataByDate = async (item, date) => {
+    // Ensure date is in dd-mm-yyyy format
+    const formattedDate = date; // e.g., '13-08-2024'
+
+    // Find all price stock data for the specific item
+    const particularPriceStockDataArray = await Price.find({ itemId: item._id });
+
+    // Filter entries for the provided date
+    const filteredData = particularPriceStockDataArray.filter(data => {
+        // Extract date from data
+        const itemDate = data.date.split(" ")[0]; // Extract 'dd-mm-yyyy'
+        return itemDate === formattedDate;
+    });
+
+    if (filteredData.length === 0) {
+        return { stock: 0, price: 0 }; // No data for the provided date
+    }
+
+    // Sort the filtered data by time in descending order to get the latest
+    filteredData.sort((a, b) => {
+        // Convert 'dd-mm-yyyy HH:mm' to a sortable format
+        const timeA = new Date(a.date.split(" ")[0].split("-").reverse().join("-") + 'T' + a.date.split(" ")[1]).getTime();
+        const timeB = new Date(b.date.split(" ")[0].split("-").reverse().join("-") + 'T' + b.date.split(" ")[1]).getTime();
+        return timeB - timeA; // Most recent time first
+    });
+
+    // The first element in the sorted array is the latest data for the provided date
+    const latestData = filteredData[0];
+
+    return { stock: latestData.stock, price: latestData.price };
+};
+
 
 
 const getPreviousDateData = async (item) => {
@@ -255,10 +313,10 @@ const getAndSetPreviousPriceStockData = async (item) => {
     // The first element in the sorted array is the latest data for yesterday
     const latestYesterdayData = yesterdayData[0];
     const priceChange = { price: latestYesterdayData.price, stock: latestYesterdayData.stock, date: getFormattedDate(), itemId: item._id }
-    await Price.create(priceChange)   
+    await Price.create(priceChange)
 };
 
-const evaluateStockChange =async (items,totalStock)=>{
+const evaluateStockChange = async (items, totalStock) => {
     let previousPriceStockData = {}
     let previousTotalStock = 0
     let previousFruitsCount = 0
@@ -282,14 +340,14 @@ const evaluateStockChange =async (items,totalStock)=>{
         } else {
             previousLeafyvegetablesCounts += previousStock;
         }
-        
-        percentageOfStockChange = calculatepercentageOfStockChange(totalStock,previousTotalStock)
+
+        percentageOfStockChange = calculatepercentageOfStockChange(totalStock, previousTotalStock)
 
     }));
     return percentageOfStockChange
 }
 
-const calculatepercentageOfStockChange = (currentValue,previousValue)=>{
+const calculatepercentageOfStockChange = (currentValue, previousValue) => {
     if (previousValue === 0) {
         return currentValue > 0 ? 100 : 0;
     }
@@ -314,7 +372,7 @@ const deleteItems = async (req, res) => {
 
 const updateItem = async (req, res) => {
     const name = req.body.name
-    const priceBody = { stock: req.body.stock, price: req.body.price, date: req.body.date, itemId: req.headers.id,newItem:false }
+    const priceBody = { stock: req.body.stock, price: req.body.price, date: req.body.date, itemId: req.headers.id, newItem: false }
     try {
         await Item.findByIdAndUpdate(
             req.headers.id,

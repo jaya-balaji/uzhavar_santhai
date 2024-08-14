@@ -8,7 +8,11 @@ import { MdModeEdit } from "react-icons/md";
 import { MdDashboard } from "react-icons/md";
 import { FaShoppingBag } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
-import { FaRupeeSign } from "react-icons/fa";
+import CalenderDate from "../Component/Calender";
+import { AiOutlineStock } from "react-icons/ai";
+import { MdOutlineCategory } from "react-icons/md";
+
+
 
 const Page = () => {
   const { id } = useParams();
@@ -22,6 +26,9 @@ const Page = () => {
   const [rowsPerPage, setrowsPerPage] = useState<number>(5);
   const [currentPage, setCurrentPage] = useState(1);
   const [tempRowsPerPage, settempRowsPerPage] = useState("");
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedStringDate, setselectedStringDate] = useState<string | null>('');
+
   const currentData = fetchedData.slice(
     (currentPage - 1) * rowsPerPage,
     currentPage * rowsPerPage
@@ -32,22 +39,22 @@ const Page = () => {
   useEffect(() => {
     const fetchData = async () => {
       const token = localStorage.getItem("token");
+
+      const headers: Record<string, string | undefined> = {
+        Authorization: `Bearer ${token}`,
+        'X-Selected-Date': selectedStringDate || '',
+      };
       try {
-        const res = await axios.get(`http://localhost:3001/item/get`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setFetchedData(res.data.filteredItems);
-        console.log(res.data.filteredItems)
-        setCounts(res.data.counts);
+        const res = await axios.get(`http://localhost:3001/item/get`, {headers});
+        res.data.filteredItems?setFetchedData(res.data.filteredItems):setFetchedData(res.data);
+        res.data.counts?setCounts(res.data.counts):'';
         setLoader(true);
       } catch (error: any) {
         setError(error.message);
       }
     };
     fetchData();
-  }, [id, loader]);
+  }, [id, loader,selectedStringDate]);
 
   const getCurrentTime = ()=>{
     const now = new Date();
@@ -152,6 +159,22 @@ const Page = () => {
     }
   };
 
+  const handleDateChange = (date: Date | null) => {
+    setSelectedDate(date)
+    if (date) {
+        const selectedDate = new Date(date);
+
+        const formattedDate = `${String(selectedDate.getDate()).padStart(2, '0')}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${selectedDate.getFullYear()}`;
+
+        setselectedStringDate(formattedDate);
+        console.log("Selected Date:", formattedDate);
+    } else {
+        setselectedStringDate(''); // or handle the null case as needed
+        console.log("No date selected");
+    }
+};
+
+
   if (error) {
     return (
       <div className="flex h-screen">
@@ -180,64 +203,56 @@ const Page = () => {
             <span className="text-2xl font-bold">Admin Dashboard</span>
           </div>
         </div>
-        <div className="flex flex-row gap-8">
+        <div className="flex flex-row gap-4">
           <div className="p-6 bg-violet-400 rounded-xl h-[27vh] w-1/3">
-            <div className="flex flex-col gap-2">
-              <div>
-                <FaShoppingBag className="scale-[150%]" />
+            <div className="flex flex-col gap-5">
+              <div className="pl-2 pt-1">
+                <FaShoppingBag className="scale-[180%]" />
               </div>
-              <div className="flex flex-col justify-between">
-                <span>Total Stock</span>
-                <span className="text-2xl font-bold">{(Counts?.totalStock)?Counts?.totalStock:0}</span>
-              </div>
-              <div className="flex flex-col">
-                <span>
-                  Fruits : <span className="font-semibold">{(Counts?.fCount)?Counts?.fCount:0}</span>
-                </span>
-                <span>
-                  Vegetables : <span className="font-semibold">{(Counts?.vCount)?Counts?.vCount:0}</span>
-                </span>
-                <span>
-                  Leafy vegetables : <span className="font-semibold">{(Counts?.vCount)?Counts?.lCount:0}</span>
-                </span>
+              <div className="flex flex-col gap-2 justify-between">
+                <span className="text-2xl font-semibold">Total Stock</span>
+                <span className="text-5xl font-bold">{(Counts?.totalStock)?Counts?.totalStock:0}</span>
               </div>
             </div>
           </div>
           <div className="p-6 bg-blue-400 rounded-xl h-[27vh] w-1/3">
-            <div className="flex flex-col gap-2">
-              <div>
-                <FaShoppingBag className="scale-[150%]" />
+            <div className="flex flex-col gap-3">
+              <div className="pl-2">
+                <AiOutlineStock className="scale-[150%] text-2xl" />
               </div>
-              <div className="flex flex-col gap-1">
-                <span>Stock change</span>
-                <span className="text-2xl font-bold">{(Counts?.SCpercentage)?Counts?.SCpercentage:0}%</span>
-              </div>
-              <div className="flex flex-col">
-                <span>
-                  Fruits : <span className="font-semibold">2500</span>
-                </span>
-                <span>
-                  Vegetables : <span className="font-semibold">2500</span>
-                </span>
+              <div className="flex flex-col gap-4">
+                <span className="text-2xl font-semibold">Stock change</span>
+                <span className="text-5xl font-bold">{(Counts?.SCpercentage)?Counts?.SCpercentage:0}%</span>
               </div>
             </div>
           </div>
           <div className="p-6 bg-orange-300 rounded-xl h-[27vh] w-1/3">
             <div className="flex flex-col gap-2">
-              <div>
-                <FaShoppingBag className="scale-[150%]" />
+              <div className="pl-2">
+                <MdOutlineCategory className="scale-[150%] text-2xl" />
               </div>
-              <div className="flex flex-col gap-1">
-                <span>Total Stock</span>
-                <span className="text-2xl font-bold">5000</span>
+              <div>
+                <span className="text-2xl font-semibold">Categories </span>
               </div>
               <div className="flex flex-col">
-                <span>
-                  Fruits : <span className="font-semibold">2500</span>
+                <div className="flex flex-row gap-24 w-[70%]">
+                  <span>
+                  Fruits
                 </span>
-                <span>
-                  Vegetables : <span className="font-semibold">2500</span>
+                <span className="font-semibold">: {(Counts?.fCount)?Counts?.fCount:0}</span>
+                </div>
+                <div className="flex flex-row gap-14 w-[70%]">
+                  <span>
+                  Vegetables 
                 </span>
+                <span className="font-semibold">: {(Counts?.fCount)?Counts?.vCount:0}</span>
+                </div>
+                <div className="flex flex-row gap-3 w-[70%]">
+                  <span>
+                  Leafy Vegetables 
+                </span>
+                <span className="font-semibold">: {(Counts?.fCount)?Counts?.lCount:0}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -268,13 +283,14 @@ const Page = () => {
                   </form>
                 </div>
               </div>
-              <div className="flex items-start justify-start">
+              <div className="flex justify-between items-center">
               <span
                 className="p-2 bg-green-500 rounded-lg cursor-pointer"
                 onClick={() => setshowForm(!showForm)}
               >
                 Add items
               </span>
+              <CalenderDate selectedDate={selectedDate} setSelectedDate={handleDateChange}/>
             </div>
             {showForm ? (
               <div>
