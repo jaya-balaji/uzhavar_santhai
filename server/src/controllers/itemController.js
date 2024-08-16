@@ -50,6 +50,8 @@ const createItem = async (req, res) => {
 }
 
 const getItems = async (req, res) => {
+    console.log(req.headers)
+    console.log(req.body)
     try {
         const dateString = req.headers['x-selected-date'];
         let responseSent = false; // Flag to track if a response has been sent       
