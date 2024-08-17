@@ -74,7 +74,6 @@ const Page = () => {
         });
 
         res.data ? setAdminData(res.data) : "";
-        console.log(res.data);
       } catch (error: any) {
         setError(error.message);
       }
@@ -201,7 +200,6 @@ const Page = () => {
       )}-${selectedDate.getFullYear()}`;
 
       setselectedStringDate(formattedDate);
-      console.log("Selected Date:", formattedDate);
     } else {
       setselectedStringDate(""); // or handle the null case as needed
       console.log("No date selected");

@@ -77,7 +77,6 @@ const getAdminData = async (req,res) =>{
 
     const AdminDataArray = await Admin.find({_id:id})
     const {email,name,phone,location} = AdminDataArray[0]
-    console.log({email,name,phone,location})
     return res.status(200).json({email,name,phone,location})
 }
 

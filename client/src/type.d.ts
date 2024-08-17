@@ -16,7 +16,8 @@ export interface counts{
 export interface UserType{
     email:String;
     name:String;
-    phone:String
+    phone:String;
+    location:string[]
 }
 
 export interface AdminType{

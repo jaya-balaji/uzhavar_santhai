@@ -4,7 +4,6 @@ const jwt = require('jsonwebtoken');
 
 //creating new data in database
 const createUser = (req,res)=>{
-    console.log("from create user",req.body)
     try {
         User.create(req.body)
         .then(user => console.log(user))
@@ -32,7 +31,6 @@ const hashPassword = async (req, res, next) => {
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
         req.body.password = hashedPassword;
-        console.log("from hashpassword")
         next();
     } catch (error) {
         res.status(500).json({ error: 'Error hashing password' });

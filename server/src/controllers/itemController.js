@@ -52,11 +52,9 @@ const createItem = async (req, res) => {
 const getItems = async (req, res) => {
     try {
         const dateString = req.headers['x-selected-date'];
-        console.log(dateString)
         let responseSent = false; // Flag to track if a response has been sent       
 
         if (dateString !== '') {
-            // Fetch items and their prices/stocks for the specific date
             const items = await Item.find({ creator: req.body.creator });
             const modifiedItems = await Promise.all(items.map(async (item) => {
                 const dataByDate = await getPriceStockDataByDate(item, dateString);

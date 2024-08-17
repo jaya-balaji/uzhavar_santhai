@@ -9,7 +9,6 @@ const authenticateToken = (req, res, next) => {
     jwt.verify(token, 'pvQCvCYknO8DpRi', (err, user) => {
         if (err) return res.status(403).json({ message: 'Forbidden' });
         req.body.creator=user.id;
-        console.log(req.body.creator)
         next();
     });
 };

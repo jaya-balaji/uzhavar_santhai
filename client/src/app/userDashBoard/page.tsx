@@ -26,7 +26,6 @@ const Page = () => {
   const [selectedLocation, setSelectedLocation] = useState<string | undefined>(
     ""
   );
-  const locations: string[] = ["Kallakurichi", "Villupuram", "Thindivanam"];
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [message, setmessage] = useState("No data found");
   const [UserData, setUserData] = useState<UserType | undefined>();
@@ -43,7 +42,6 @@ const Page = () => {
         const res = await axios.get(`http://localhost:3001/userItem/get`, {
           headers,
         });
-        console.log(res.data);
         res.data.message
           ? setmessage(res.data.message)
           : setmessage("No data found for the location");
@@ -139,7 +137,6 @@ const Page = () => {
       )}-${selectedDate.getFullYear()}`;
 
       setselectedStringDate(formattedDate);
-      console.log("Selected Date:", formattedDate);
     } else {
       setselectedStringDate("");
       console.log("No date selected");
@@ -337,7 +334,7 @@ const Page = () => {
                       aria-orientation="vertical"
                       aria-labelledby="options-menu"
                     >
-                      {locations.map((location, index) => (
+                      {UserData?.location.map((location, index) => (
                         <label
                           key={index}
                           className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
