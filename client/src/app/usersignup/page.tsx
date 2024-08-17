@@ -3,8 +3,11 @@ import React from "react";
 import Link from "next/link";
 import { useState } from "react";
 import axios from "axios";
+import { useRouter } from "next/navigation";
+
 
 const page = () => {
+  const router = useRouter()
   const [name,setname] = useState("")
   const [phone,setphone] = useState("")
   const [email,setemail] = useState("")
@@ -13,8 +16,10 @@ const page = () => {
   const handleSubmit= (e: any) => {
     e.preventDefault()
     axios.post('http://localhost:3001/user/register',{name,phone,email,password})
-    .then(result => console.log(result))
-    .catch(err=> console.log(err))
+    .then(res => {
+          router.push(`/userlogin`);
+    })
+    .catch(err => console.log(err))
   }
   return (
     <div className="flex items-center justify-center h-[100vh] background">

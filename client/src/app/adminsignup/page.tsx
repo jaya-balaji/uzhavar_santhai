@@ -3,6 +3,8 @@ import React from "react";
 import Link from "next/link";
 import { useState } from "react";
 import axios from "axios";
+import { useRouter } from "next/navigation";
+
 
 const page = () => {
   const [name,setname] = useState("")
@@ -10,13 +12,15 @@ const page = () => {
   const [phone,setphone] = useState("")
   const [email,setemail] = useState("")
   const [password,setpassword] = useState("")
-
+  const router = useRouter()
 
   const handleSubmit= (e: any) => {
     e.preventDefault()
     axios.post('http://localhost:3001/admin/register',{name,location,phone,email,password})
-    .then(result => console.log(result))
-    .catch(err=> console.log(err))
+    .then(res => {
+      router.push(`/adminlogin`);
+})
+.catch(err => console.log(err))
   }
 
   return (
@@ -42,7 +46,7 @@ const page = () => {
             <button className="text-green-700 hover:underline text-sm md:text-base"><Link href="/adminlogin">login</Link></button>
         </div>
         <div className="flex items-center justify-center w-[100%] ">
-          <button type="submit" className="md:text-lg text-base md:font-medium text-white p-2 md:p-4 bg-green-700 rounded-2xl hover:scale-105 transition-transform" onClick={handleSubmit} ><Link href="/adminlogin">Sign up</Link></button>
+          <button type="submit" className="md:text-lg text-base md:font-medium text-white p-2 md:p-4 bg-green-700 rounded-2xl hover:scale-105 transition-transform" onClick={handleSubmit} >Sign up</button>
         </div>
       </form>
     </div>

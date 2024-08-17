@@ -1,19 +1,26 @@
 const { request } = require('express')
 const Admin = require('../models/adminSchema')
+const User = require("../models/userSchema")
 
 const getAndSetthecreater =async (req,res,next)=>{
     const location = req.headers.location
-    console.log("hiiiiiiiiiiiiiiiiiiiii")
 
     const admin = await Admin.find({location : location})
-    console.log(admin[0])
-    if(admin._id===null){
-        res.status(403).json({message:"No creator for the location"})
+    if(admin.length===0){
+        return res.status(200).json([])
+    } else {
+        const adminData = admin[0]
+        req.body.creator = adminData._id.toString()
+        next();
     }
-    const adminData = admin[0]
-    req.body.creator = adminData._id
-    console.log(req.body.creator)
-    next();
 }
 
-module.exports = {getAndSetthecreater}
+const getuserData = async (req,res) =>{
+    const id = req.body.user
+
+    const userDataArray = await User.find({_id:id})
+    const {email,name,phone} = userDataArray[0]
+    return res.status(200).json({email,name,phone})
+}
+
+module.exports = {getAndSetthecreater,getuserData}

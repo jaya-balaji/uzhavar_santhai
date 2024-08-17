@@ -12,3 +12,16 @@ export interface counts{
     lCount:string,
     SCpercentage: string
 }
+
+export interface UserType{
+    email:String;
+    name:String;
+    phone:String
+}
+
+export interface AdminType{
+    email:String;
+    name:String;
+    phone:String;
+    location:String
+}

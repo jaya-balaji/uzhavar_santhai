@@ -50,10 +50,9 @@ const createItem = async (req, res) => {
 }
 
 const getItems = async (req, res) => {
-    console.log(req.headers)
-    console.log(req.body)
     try {
         const dateString = req.headers['x-selected-date'];
+        console.log(dateString)
         let responseSent = false; // Flag to track if a response has been sent       
 
         if (dateString !== '') {
@@ -71,7 +70,6 @@ const getItems = async (req, res) => {
             
             const filteredItems = modifiedItems.filter(item => item.stock !== 0);
             filteredItems.sort((a, b) => a.price - b.price);
-            console.log(filteredItems)
 
             if (!responseSent) {
                 res.status(200).json(filteredItems);
@@ -110,7 +108,6 @@ const getItems = async (req, res) => {
         const filteredItems = modifiedItems.filter(item => item.stock !== 0);
 
         if (filteredItems.length === 0) {
-            // Fetch previous price stock data if no filtered items
             await Promise.all(items.map(async (item) => {
                 await getAndSetPreviousPriceStockData(item);
             }));
