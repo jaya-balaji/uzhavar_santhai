@@ -16,7 +16,7 @@ const page = () => {
      await axios.post('https://uzhavar-santhai-backend.vercel.app/admin/authAdminData',{email:email,password:password}) 
     .then(res => {
       localStorage.setItem('token',res.data.id)
-        if(!res.data.err){
+      if(!res.data.err){
           router.push(`/adminboard`);
         } else{
           console.log("Invalid Credential")
