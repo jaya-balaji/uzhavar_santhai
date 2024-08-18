@@ -13,7 +13,6 @@ app.use(express.json())
 const corsOptions = {
     origin: '*', // Allow all origins
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allow all methods
-    allowedHeaders: ['Content-Type', 'Authorization'], // Specify headers if needed
 };
 app.use(cors(corsOptions));
 
