@@ -11,11 +11,21 @@ const app = express()
 app.use(express.json())
 // CORS configuration to allow all origins and methods
 const corsOptions = {
-    origin: '*', // Allow all origins
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allow all methods
+    origin: "*",
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    preflightContinue: false,
+    optionsSuccessStatus: 204
 };
-app.use(cors(corsOptions));
 
+
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    next();
+  });
+
+  app.use(cors(corsOptions));
+
+  
 app.get('/', (req, res) => {
     res.send('Welcome to the homepage!');
 });
@@ -26,7 +36,7 @@ app.use('/item',itemRoutes)
 app.use('/user',userRoutes)
 app.use('/userItem',userItemRoutes)
 
-const uri="mongodb+srv://balabavan1013:123abc@balajidb.fahx7.mongodb.net/farmerDB?retryWrites=true&w=majority"
+const uri="mongodb+srv://balabavan1013:123abc@balajidb.fahx7.mongodb.net/farmerDB"
 mongoose.connect(uri).then(()=>console.log("mongo DB connected")).catch(err => {
     console.error("Failed to connect to MongoDB", err);
 });
