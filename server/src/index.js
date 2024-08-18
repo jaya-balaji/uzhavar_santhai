@@ -17,7 +17,7 @@ app.use('/user',userRoutes)
 app.use('/userItem',userItemRoutes)
 
 
-mangoose.connect("mongodb://127.0.0.1:27017/admin").then(()=>console.log("mongo DB connected"))
+mangoose.connect("mongodb+srv://balabavan1013:123abc@balajidb.fahx7.mongodb.net/farmerDB").then(()=>console.log("mongo DB connected"))
 
 app.listen(3001, ()=>{
     console.log("server is running on port 3001")
