@@ -9,9 +9,7 @@ const userItemRoutes = require('./routes/userItemRoutes')
 
 const app = express()
 app.use(express.json())
-app.use(cors({
-    origin: 'https://uzhavar-santhai.vercel.app'
-}));
+app.use(cors());
 
 app.get('/', (req, res) => {
     res.send('Welcome to the homepage!');
