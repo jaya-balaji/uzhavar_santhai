@@ -15,7 +15,7 @@ const page = () => {
 
   const handleSubmit= (e: any) => {
     e.preventDefault()
-    axios.post('https://uzhavar-santhai-backend-kup71ww7i-jaya-balajis-projects.vercel.app/user/register',{name,phone,email,password})
+    axios.post('https://uzhavar-santhai-backend.vercel.app/user/register',{name,phone,email,password})
     .then(res => {
           router.push(`/userlogin`);
     })

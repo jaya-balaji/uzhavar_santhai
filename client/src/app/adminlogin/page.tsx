@@ -13,7 +13,7 @@ const page = () => {
 
   const login = async (e : any) =>{
     e.preventDefault()
-     await axios.post('https://uzhavar-santhai-backend-kup71ww7i-jaya-balajis-projects.vercel.app/admin/authAdminData',{email:email,password:password}) 
+     await axios.post('https://uzhavar-santhai-backend.vercel.app/admin/authAdminData',{email:email,password:password}) 
     .then(res => {
       localStorage.setItem('token',res.data.id)
         if(!res.data.err){

@@ -18,7 +18,7 @@ const page = () => {
 
   const handleSubmit= (e: any) => {
     e.preventDefault()
-    axios.post('https://uzhavar-santhai-backend-kup71ww7i-jaya-balajis-projects.vercel.app/admin/register',{name,location,phone,email,password})
+    axios.post('https://uzhavar-santhai-backend.vercel.app/admin/register',{name,location,phone,email,password})
     .then(res => {
       console.log(res.data.message)
       if(res.data.boolean){

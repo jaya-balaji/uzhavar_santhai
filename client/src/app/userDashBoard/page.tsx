@@ -39,7 +39,7 @@ const Page = () => {
         location: selectedLocation || "",
       };
       try {
-        const res = await axios.get(`https://uzhavar-santhai-backend-kup71ww7i-jaya-balajis-projects.vercel.app/userItem/get`, {
+        const res = await axios.get(`https://uzhavar-santhai-backend.vercel.app/userItem/get`, {
           headers,
         });
         res.data.message
@@ -71,7 +71,7 @@ const Page = () => {
         Authorization: `Bearer ${token}`,
       };
       try {
-        const res = await axios.get(`https://uzhavar-santhai-backend-kup71ww7i-jaya-balajis-projects.vercel.app/user/userdata`, {
+        const res = await axios.get(`https://uzhavar-santhai-backend.vercel.app/user/userdata`, {
           headers,
         });
 
