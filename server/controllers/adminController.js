@@ -1,5 +1,5 @@
 const Admin=require('../models/adminSchema');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 //creating new data in database
