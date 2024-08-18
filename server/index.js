@@ -26,7 +26,7 @@ app.use('/item',itemRoutes)
 app.use('/user',userRoutes)
 app.use('/userItem',userItemRoutes)
 
-const uri="mongodb+srv://balabavan1013:123abc@balajidb.fahx7.mongodb.net/farmerDB?retryWrites=true&w=majority"
+const uri="mongodb+srv://balabavan1013:123abc@balajidb.fahx7.mongodb.net/farmerDB?retryWrites=true&w=majority&directConnection=true"
 mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true } ).then(()=>console.log("mongo DB connected")).catch(err => {
     console.error("Failed to connect to MongoDB", err);
 });
