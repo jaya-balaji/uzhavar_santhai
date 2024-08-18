@@ -3,6 +3,21 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 //creating new data in database
+const isLocationExists =async (req,res,next) =>{
+
+    const location = req.body.location
+
+    const getAdminData = await Admin.find()
+    
+    const isLocationFound = getAdminData.some(data => data.location === location)
+
+    if(isLocationFound){
+        res.status(200).json({message:"Admin already exists for the location",boolean:false})
+    } else {
+        next();
+    }
+}
+
 const createAdmin = (req,res)=>{
 
     try {
@@ -14,6 +29,8 @@ const createAdmin = (req,res)=>{
             error: false,
             message: "Admin data Saved successfully"
         })
+
+        
     } catch (error) {
         console.log("ERROR IN DELETING ADMIN")
         res.status(500)
@@ -80,4 +97,4 @@ const getAdminData = async (req,res) =>{
     return res.status(200).json({email,name,phone,location})
 }
 
-module.exports = {createAdmin,deleteAdmin,loginAdmin,hashPassword,getAdminData}
+module.exports = {isLocationExists,createAdmin,deleteAdmin,loginAdmin,hashPassword,getAdminData}

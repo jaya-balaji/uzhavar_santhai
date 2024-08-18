@@ -13,12 +13,20 @@ const page = () => {
   const [email,setemail] = useState("")
   const [password,setpassword] = useState("")
   const router = useRouter()
+  const [message,setmessage] = useState()
+  const [showMessage,setshowMessage] = useState(false)
 
   const handleSubmit= (e: any) => {
     e.preventDefault()
     axios.post('http://localhost:3001/admin/register',{name,location,phone,email,password})
     .then(res => {
-      router.push(`/adminlogin`);
+      console.log(res.data.message)
+      if(res.data.boolean){
+        router.push(`/adminlogin`);
+      } else {
+          setmessage(res.data.message)
+          setshowMessage(true)
+      }
 })
 .catch(err => console.log(err))
   }
@@ -26,6 +34,9 @@ const page = () => {
   return (
     <div className="flex items-center justify-center h-[100vh] background">
       <form onSubmit={handleSubmit} className="flex flex-col items-center justify-center gap-4 md:gap-8 bg-black p-10 md:p-16 rounded-3xl bg-opacity-70 md:w-[70vh]">
+        <div className="text-white">
+          {message}
+        </div>
         <div className="flex flex-row gap-8 justify-between items-center">
           <input type="text" placeholder="Enter Name" className="rounded-sm p-1 md:p-2 md:w-[40vh] w-[25vh] outline-none " onChange={(e)=>setname(e.target.value)}></input>
         </div>
