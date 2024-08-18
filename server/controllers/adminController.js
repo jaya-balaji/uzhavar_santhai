@@ -13,7 +13,7 @@ const isLocationExists =async (req,res,next) =>{
         const isLocationFound = getAdminData.some(data => data.location === location)
     
         if(isLocationFound){
-            res.status(200).json({message:"Admin already exists for the location",boolean:false})
+            return res.status(200).json({message:"Admin already exists for the location",boolean:false})
         } else {
             next();
         }
@@ -27,15 +27,15 @@ const createAdmin = (req,res)=>{
 
     try {
         Admin.create(req.body)
-        .then(admin => console.log(admin))
-        .catch(err => res.json(err))
-        res.status(200)
+        .then(admin => {
+         res.status(200)
         .send({
             error: false,
             message: "Admin data Saved successfully"
         })
-
-        
+        })
+        .catch(err => res.json(err))
+      
     } catch (error) {
         console.log("ERROR IN DELETING ADMIN")
         res.status(500)
