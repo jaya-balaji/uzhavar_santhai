@@ -47,7 +47,7 @@ const Page = () => {
         "X-Selected-Date": selectedStringDate || "",
       };
       try {
-        const res = await axios.get(`http://localhost:3001/item/get`, {
+        const res = await axios.get(`https://uzhavar-santhai-backend-kup71ww7i-jaya-balajis-projects.vercel.app/item/get`, {
           headers,
         });
         res.data.filteredItems
@@ -69,7 +69,7 @@ const Page = () => {
         Authorization: `Bearer ${token}`,
       };
       try {
-        const res = await axios.get(`http://localhost:3001/admin/get`, {
+        const res = await axios.get(`https://uzhavar-santhai-backend-kup71ww7i-jaya-balajis-projects.vercel.app/admin/get`, {
           headers,
         });
 
@@ -101,7 +101,7 @@ const Page = () => {
     try {
       const response = await axios
         .post(
-          `http://localhost:3001/item/create`,
+          `https://uzhavar-santhai-backend-kup71ww7i-jaya-balajis-projects.vercel.app/item/create`,
           {
             name: itemData.name,
             price: itemData.price,
@@ -127,7 +127,7 @@ const Page = () => {
   const handleDelete = async (id: string) => {
     const token = localStorage.getItem("token");
     try {
-      await axios.get(`http://localhost:3001/item/delete`, {
+      await axios.get(`https://uzhavar-santhai-backend-kup71ww7i-jaya-balajis-projects.vercel.app/item/delete`, {
         headers: {
           Authorization: `Bearer ${token}`,
           id: id,
@@ -152,7 +152,7 @@ const Page = () => {
     const token = localStorage.getItem("token");
     try {
       await axios.put(
-        `http://localhost:3001/item/update`,
+        `https://uzhavar-santhai-backend-kup71ww7i-jaya-balajis-projects.vercel.app/item/update`,
         {
           name: itemData.name,
           price: itemData.price,
