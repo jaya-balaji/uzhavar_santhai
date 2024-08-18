@@ -22,7 +22,7 @@ app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
     next();
   });
-
+  
   app.use(cors(corsOptions));
 
   
@@ -36,7 +36,7 @@ app.use('/item',itemRoutes)
 app.use('/user',userRoutes)
 app.use('/userItem',userItemRoutes)
 
-const uri="mongodb+srv://Badhri007:Badlak717@money-matrix.0i3z4s6.mongodb.net/farmerDB"
+const uri="mongodb+srv://balabavan1013:qwerty123@balajidb.fahx7.mongodb.net/farmerDB"
 mongoose.connect(uri).then(()=>console.log("mongo DB connected")).catch(err => {
     console.error("Failed to connect to MongoDB", err);
 });
