@@ -9,7 +9,13 @@ const userItemRoutes = require('./routes/userItemRoutes')
 
 const app = express()
 app.use(express.json())
-app.use(cors());
+// CORS configuration to allow all origins and methods
+const corsOptions = {
+    origin: '*', // Allow all origins
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allow all methods
+    allowedHeaders: ['Content-Type', 'Authorization'], // Specify headers if needed
+};
+app.use(cors(corsOptions));
 
 app.get('/', (req, res) => {
     res.send('Welcome to the homepage!');
