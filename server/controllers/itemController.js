@@ -173,7 +173,6 @@ const getpriceStockData = async (item) => {
         return { stock: latestData.stock, price: latestData.price };
     } catch (error) {
         console.error('Error fetching items:', error); // Log the error
-        res.status(500).json({ message: 'Error in getpriceStockData', error }); // Send error response
     }
 
 };
@@ -212,7 +211,6 @@ const getPreviousPriceStockData = async (item) => {
         return { stock: latestYesterdayData.stock, price: latestYesterdayData.price };
     } catch (error) {
         console.error('Error:', error); // Log the error
-        res.status(500).json({ message: 'Error in getPreviousPriceStockData', error }); // Send error response
     }
   
 };
@@ -249,46 +247,10 @@ const getPriceStockDataByDate = async (item, date) => {
 
     return { stock: latestData.stock, price: latestData.price };
     } catch (error) {
-        res.status(500).json({ message: 'Error in getPriceStockDataByDate', error }); // Send error response
+        console.log("error",error)
     }
 };
 
-
-
-const getPreviousDateData = async (item) => {
-    try {
-        const particularPriceStockDataArray = await Price.find({ itemId: item._id });
-
-        // Calculate yesterday's date in dd-mm-yyyy format
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
-        const formattedYesterday = yesterday.toLocaleDateString("en-GB").split("/").join("-");
-    
-        // Filter entries for yesterday
-        const yesterdayData = particularPriceStockDataArray.filter(data => {
-            const itemDate = data.date.split(" ")[0]; // Extract 'dd-mm-yyyy'
-            return itemDate === formattedYesterday;
-        });
-    
-        if (yesterdayData.length === 0) {
-            return { stock: 0, price: 0 };; // No data for yesterday
-        }
-    
-        // Sort the filtered data by time in descending order to get the latest
-        yesterdayData.sort((a, b) => {
-            const timeA = new Date(a.date.split(" ")[0].split("-").reverse().join("-") + 'T' + a.date.split(" ")[1]).getTime();
-            const timeB = new Date(b.date.split(" ")[0].split("-").reverse().join("-") + 'T' + b.date.split(" ")[1]).getTime();
-            return timeB - timeA; // Most recent time first
-        });
-    
-        // The first element in the sorted array is the latest data for yesterday
-        const latestYesterdayData = yesterdayData[0];
-    
-        return { stock: latestYesterdayData.stock, price: latestYesterdayData.price };
-    } catch (error) {
-        res.status(500).json({ message: 'Error in getPreviousDateData', error }); // Send error response
-    }
-};
 
 const getFormattedDate = () => {
     try {
@@ -301,7 +263,7 @@ const getFormattedDate = () => {
     
         return `${day}-${month}-${year} ${hours}:${minutes}`;
     } catch (error) {
-        res.status(500).json({ message: 'Error in getFormattedDate', error }); // Send error response
+        console.error('Error:', error); // Log the error
     }
 };
 
@@ -337,7 +299,7 @@ const getAndSetPreviousPriceStockData = async (item) => {
         const priceChange = { price: latestYesterdayData.price, stock: latestYesterdayData.stock, date: getFormattedDate(), itemId: item._id }
         await Price.create(priceChange)
     } catch (error) {
-        res.status(500).json({ message: 'Error in getAndSetPreviousPriceStockData', error }); // Send error response
+        console.error('Error:', error); // Log the error
     }
 };
 
@@ -372,7 +334,7 @@ const evaluateStockChange = async (items, totalStock) => {
         }));
         return percentageOfStockChange
     } catch (error) {
-        res.status(500).json({ message: 'Error in evaluateStockChange', error }); // Send error response
+        console.error('Error:', error); // Log the error
     }
 }
 
@@ -384,7 +346,7 @@ const calculatepercentageOfStockChange = (currentValue, previousValue) => {
         const change = ((currentValue - previousValue) / previousValue) * 100;
         return change;
     } catch (error) {
-        res.status(500).json({ message: 'Error in calculatepercentageOfStockChange', error }); // Send error response
+        console.error('Error:', error); // Log the error
     }
 }
 

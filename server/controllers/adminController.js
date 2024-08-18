@@ -60,16 +60,6 @@ const hashPassword = async (req, res, next) => {
     }
 };
 
-
-//deleting admin data
-const deleteAdmin=(req,res)=>{
-    try {
-         
-    } catch (error) {
-        console.log("ERROR IN DELETING ADMIN")
-    }
-}
-
 //authentication of Admin data
 const loginAdmin = async (req, res) => {
     const { email, password } = req.body;
