@@ -143,70 +143,83 @@ const getItems = async (req, res) => {
 };
 
 const getpriceStockData = async (item) => {
-    const particularPriceStockDataArray = await Price.find({ itemId: item._id });
 
-    // Get today's date in dd-mm-yyyy format
-    const today = new Date().toLocaleDateString('en-GB').split('/').join('-'); // 'dd-mm-yyyy'
+    try{
+        const particularPriceStockDataArray = await Price.find({ itemId: item._id });
 
-    // Filter entries for today
-    const todayData = particularPriceStockDataArray.filter(data => {
-        const itemDate = data.date.split(' ')[0]; // Extract 'dd-mm-yyyy'
-        return itemDate === today;
-    });
-
-    if (todayData.length === 0) {
-        return { stock: 0, price: 0 }; // No data for today
+        const today = new Date().toLocaleDateString('en-GB').split('/').join('-'); // 'dd-mm-yyyy'
+    
+        const todayData = particularPriceStockDataArray.filter(data => {
+            const itemDate = data.date.split(' ')[0]; 
+            return itemDate === today;
+        });
+    
+        if (todayData.length === 0) {
+            return { stock: 0, price: 0 }; // No data for today
+        }
+    
+    
+        // Sort the filtered data by time in descending order
+        todayData.sort((a, b) => {
+            // Convert 'dd-mm-yyyy hh:mm' to 'yyyy-mm-ddThh:mm' for Date parsing
+            const dateA = new Date(a.date.split(' ')[0].split('-').reverse().join('-') + 'T' + a.date.split(' ')[1]).getTime();
+            const dateB = new Date(b.date.split(' ')[0].split('-').reverse().join('-') + 'T' + b.date.split(' ')[1]).getTime();
+    
+            return dateB - dateA; // Sort in descending order (most recent first)
+        });
+        // The first item in the sorted array is the most recent
+        const latestData = todayData[0];
+    
+        return { stock: latestData.stock, price: latestData.price };
+    } catch (error) {
+        console.error('Error fetching items:', error); // Log the error
+        res.status(500).json({ message: 'Error in getpriceStockData', error }); // Send error response
     }
 
-
-    // Sort the filtered data by time in descending order
-    todayData.sort((a, b) => {
-        // Convert 'dd-mm-yyyy hh:mm' to 'yyyy-mm-ddThh:mm' for Date parsing
-        const dateA = new Date(a.date.split(' ')[0].split('-').reverse().join('-') + 'T' + a.date.split(' ')[1]).getTime();
-        const dateB = new Date(b.date.split(' ')[0].split('-').reverse().join('-') + 'T' + b.date.split(' ')[1]).getTime();
-
-        return dateB - dateA; // Sort in descending order (most recent first)
-    });
-    // The first item in the sorted array is the most recent
-    const latestData = todayData[0];
-
-    return { stock: latestData.stock, price: latestData.price };
 };
 
 
 const getPreviousPriceStockData = async (item) => {
-    const particularPriceStockDataArray = await Price.find({ itemId: item._id });
 
-    // Calculate yesterday's date in dd-mm-yyyy format
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    const formattedYesterday = yesterday.toLocaleDateString("en-GB").split("/").join("-");
+    try{
+        const particularPriceStockDataArray = await Price.find({ itemId: item._id });
 
-    // Filter entries for yesterday
-    const yesterdayData = particularPriceStockDataArray.filter(data => {
-        const itemDate = data.date.split(" ")[0]; // Extract 'dd-mm-yyyy'
-        return itemDate === formattedYesterday;
-    });
-
-    if (yesterdayData.length === 0) {
-        return { stock: 0, price: 0 };; // No data for yesterday
+        // Calculate yesterday's date in dd-mm-yyyy format
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const formattedYesterday = yesterday.toLocaleDateString("en-GB").split("/").join("-");
+    
+        // Filter entries for yesterday
+        const yesterdayData = particularPriceStockDataArray.filter(data => {
+            const itemDate = data.date.split(" ")[0]; // Extract 'dd-mm-yyyy'
+            return itemDate === formattedYesterday;
+        });
+    
+        if (yesterdayData.length === 0) {
+            return { stock: 0, price: 0 };; // No data for yesterday
+        }
+    
+        // Sort the filtered data by time in descending order to get the latest
+        yesterdayData.sort((a, b) => {
+            const timeA = new Date(a.date.split(" ")[0].split("-").reverse().join("-") + 'T' + a.date.split(" ")[1]).getTime();
+            const timeB = new Date(b.date.split(" ")[0].split("-").reverse().join("-") + 'T' + b.date.split(" ")[1]).getTime();
+            return timeB - timeA; // Most recent time first
+        });
+    
+        // The first element in the sorted array is the latest data for yesterday
+        const latestYesterdayData = yesterdayData[0];
+    
+        return { stock: latestYesterdayData.stock, price: latestYesterdayData.price };
+    } catch (error) {
+        console.error('Error:', error); // Log the error
+        res.status(500).json({ message: 'Error in getPreviousPriceStockData', error }); // Send error response
     }
-
-    // Sort the filtered data by time in descending order to get the latest
-    yesterdayData.sort((a, b) => {
-        const timeA = new Date(a.date.split(" ")[0].split("-").reverse().join("-") + 'T' + a.date.split(" ")[1]).getTime();
-        const timeB = new Date(b.date.split(" ")[0].split("-").reverse().join("-") + 'T' + b.date.split(" ")[1]).getTime();
-        return timeB - timeA; // Most recent time first
-    });
-
-    // The first element in the sorted array is the latest data for yesterday
-    const latestYesterdayData = yesterdayData[0];
-
-    return { stock: latestYesterdayData.stock, price: latestYesterdayData.price };
+  
 };
 
 const getPriceStockDataByDate = async (item, date) => {
-    // Ensure date is in dd-mm-yyyy format
+    try {
+            // Ensure date is in dd-mm-yyyy format
     const formattedDate = date; // e.g., '13-08-2024'
 
     // Find all price stock data for the specific item
@@ -235,121 +248,144 @@ const getPriceStockDataByDate = async (item, date) => {
     const latestData = filteredData[0];
 
     return { stock: latestData.stock, price: latestData.price };
+    } catch (error) {
+        res.status(500).json({ message: 'Error in getPriceStockDataByDate', error }); // Send error response
+    }
 };
 
 
 
 const getPreviousDateData = async (item) => {
-    const particularPriceStockDataArray = await Price.find({ itemId: item._id });
+    try {
+        const particularPriceStockDataArray = await Price.find({ itemId: item._id });
 
-    // Calculate yesterday's date in dd-mm-yyyy format
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    const formattedYesterday = yesterday.toLocaleDateString("en-GB").split("/").join("-");
-
-    // Filter entries for yesterday
-    const yesterdayData = particularPriceStockDataArray.filter(data => {
-        const itemDate = data.date.split(" ")[0]; // Extract 'dd-mm-yyyy'
-        return itemDate === formattedYesterday;
-    });
-
-    if (yesterdayData.length === 0) {
-        return { stock: 0, price: 0 };; // No data for yesterday
+        // Calculate yesterday's date in dd-mm-yyyy format
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const formattedYesterday = yesterday.toLocaleDateString("en-GB").split("/").join("-");
+    
+        // Filter entries for yesterday
+        const yesterdayData = particularPriceStockDataArray.filter(data => {
+            const itemDate = data.date.split(" ")[0]; // Extract 'dd-mm-yyyy'
+            return itemDate === formattedYesterday;
+        });
+    
+        if (yesterdayData.length === 0) {
+            return { stock: 0, price: 0 };; // No data for yesterday
+        }
+    
+        // Sort the filtered data by time in descending order to get the latest
+        yesterdayData.sort((a, b) => {
+            const timeA = new Date(a.date.split(" ")[0].split("-").reverse().join("-") + 'T' + a.date.split(" ")[1]).getTime();
+            const timeB = new Date(b.date.split(" ")[0].split("-").reverse().join("-") + 'T' + b.date.split(" ")[1]).getTime();
+            return timeB - timeA; // Most recent time first
+        });
+    
+        // The first element in the sorted array is the latest data for yesterday
+        const latestYesterdayData = yesterdayData[0];
+    
+        return { stock: latestYesterdayData.stock, price: latestYesterdayData.price };
+    } catch (error) {
+        res.status(500).json({ message: 'Error in getPreviousDateData', error }); // Send error response
     }
-
-    // Sort the filtered data by time in descending order to get the latest
-    yesterdayData.sort((a, b) => {
-        const timeA = new Date(a.date.split(" ")[0].split("-").reverse().join("-") + 'T' + a.date.split(" ")[1]).getTime();
-        const timeB = new Date(b.date.split(" ")[0].split("-").reverse().join("-") + 'T' + b.date.split(" ")[1]).getTime();
-        return timeB - timeA; // Most recent time first
-    });
-
-    // The first element in the sorted array is the latest data for yesterday
-    const latestYesterdayData = yesterdayData[0];
-
-    return { stock: latestYesterdayData.stock, price: latestYesterdayData.price };
 };
 
 const getFormattedDate = () => {
-    const now = new Date();
-    const day = String(now.getDate()).padStart(2, '0');
-    const month = String(now.getMonth() + 1).padStart(2, '0'); // January is 0!
-    const year = now.getFullYear();
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-
-    return `${day}-${month}-${year} ${hours}:${minutes}`;
+    try {
+        const now = new Date();
+        const day = String(now.getDate()).padStart(2, '0');
+        const month = String(now.getMonth() + 1).padStart(2, '0'); // January is 0!
+        const year = now.getFullYear();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+    
+        return `${day}-${month}-${year} ${hours}:${minutes}`;
+    } catch (error) {
+        res.status(500).json({ message: 'Error in getFormattedDate', error }); // Send error response
+    }
 };
 
 
 const getAndSetPreviousPriceStockData = async (item) => {
-    const particularPriceStockDataArray = await Price.find({ itemId: item._id });
+    try {
+        const particularPriceStockDataArray = await Price.find({ itemId: item._id });
 
-    // Calculate yesterday's date in dd-mm-yyyy format
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    const formattedYesterday = yesterday.toLocaleDateString("en-GB").split("/").join("-");
-
-    // Filter entries for yesterday
-    const yesterdayData = particularPriceStockDataArray.filter(data => {
-        const itemDate = data.date.split(" ")[0]; // Extract 'dd-mm-yyyy'
-        return itemDate === formattedYesterday;
-    });
-
-    if (yesterdayData.length === 0) {
-        return { stock: 0, price: 0 };; // No data for yesterday
+        // Calculate yesterday's date in dd-mm-yyyy format
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const formattedYesterday = yesterday.toLocaleDateString("en-GB").split("/").join("-");
+    
+        // Filter entries for yesterday
+        const yesterdayData = particularPriceStockDataArray.filter(data => {
+            const itemDate = data.date.split(" ")[0]; // Extract 'dd-mm-yyyy'
+            return itemDate === formattedYesterday;
+        });
+    
+        if (yesterdayData.length === 0) {
+            return { stock: 0, price: 0 };; // No data for yesterday
+        }
+    
+        // Sort the filtered data by time in descending order to get the latest
+        yesterdayData.sort((a, b) => {
+            const timeA = new Date(a.date.split(" ")[0].split("-").reverse().join("-") + 'T' + a.date.split(" ")[1]).getTime();
+            const timeB = new Date(b.date.split(" ")[0].split("-").reverse().join("-") + 'T' + b.date.split(" ")[1]).getTime();
+            return timeB - timeA; // Most recent time first
+        });
+    
+        // The first element in the sorted array is the latest data for yesterday
+        const latestYesterdayData = yesterdayData[0];
+        const priceChange = { price: latestYesterdayData.price, stock: latestYesterdayData.stock, date: getFormattedDate(), itemId: item._id }
+        await Price.create(priceChange)
+    } catch (error) {
+        res.status(500).json({ message: 'Error in getAndSetPreviousPriceStockData', error }); // Send error response
     }
-
-    // Sort the filtered data by time in descending order to get the latest
-    yesterdayData.sort((a, b) => {
-        const timeA = new Date(a.date.split(" ")[0].split("-").reverse().join("-") + 'T' + a.date.split(" ")[1]).getTime();
-        const timeB = new Date(b.date.split(" ")[0].split("-").reverse().join("-") + 'T' + b.date.split(" ")[1]).getTime();
-        return timeB - timeA; // Most recent time first
-    });
-
-    // The first element in the sorted array is the latest data for yesterday
-    const latestYesterdayData = yesterdayData[0];
-    const priceChange = { price: latestYesterdayData.price, stock: latestYesterdayData.stock, date: getFormattedDate(), itemId: item._id }
-    await Price.create(priceChange)
 };
 
 const evaluateStockChange = async (items, totalStock) => {
-    let previousPriceStockData = {}
-    let previousTotalStock = 0
-    let previousFruitsCount = 0
-    let previousVegetablesCount = 0
-    let previousLeafyvegetablesCounts = 0
-    let percentageOfStockChange = 0
-    let previousStock = 0
-
-    await Promise.all(items.map(async (item) => {
-
-        previousPriceStockData = await getPreviousPriceStockData(item);
-        if (previousPriceStockData) {
-            previousStock = parseInt(previousPriceStockData.stock, 10);
-            previousTotalStock += previousStock;
-        }
-
-        if (fruits.includes(item.name.toLowerCase())) {
-            previousFruitsCount += previousStock;
-        } else if (vegetables.includes(item.name.toLowerCase())) {
-            previousVegetablesCount += previousStock;
-        } else {
-            previousLeafyvegetablesCounts += previousStock;
-        }
-
-        percentageOfStockChange = calculatepercentageOfStockChange(totalStock, previousTotalStock)
-
-    }));
-    return percentageOfStockChange
+    try {
+        let previousPriceStockData = {}
+        let previousTotalStock = 0
+        let previousFruitsCount = 0
+        let previousVegetablesCount = 0
+        let previousLeafyvegetablesCounts = 0
+        let percentageOfStockChange = 0
+        let previousStock = 0
+    
+        await Promise.all(items.map(async (item) => {
+    
+            previousPriceStockData = await getPreviousPriceStockData(item);
+            if (previousPriceStockData) {
+                previousStock = parseInt(previousPriceStockData.stock, 10);
+                previousTotalStock += previousStock;
+            }
+    
+            if (fruits.includes(item.name.toLowerCase())) {
+                previousFruitsCount += previousStock;
+            } else if (vegetables.includes(item.name.toLowerCase())) {
+                previousVegetablesCount += previousStock;
+            } else {
+                previousLeafyvegetablesCounts += previousStock;
+            }
+    
+            percentageOfStockChange = calculatepercentageOfStockChange(totalStock, previousTotalStock)
+    
+        }));
+        return percentageOfStockChange
+    } catch (error) {
+        res.status(500).json({ message: 'Error in evaluateStockChange', error }); // Send error response
+    }
 }
 
 const calculatepercentageOfStockChange = (currentValue, previousValue) => {
-    if (previousValue === 0) {
-        return currentValue > 0 ? 100 : 0;
+    try {
+        if (previousValue === 0) {
+            return currentValue > 0 ? 100 : 0;
+        }
+        const change = ((currentValue - previousValue) / previousValue) * 100;
+        return change;
+    } catch (error) {
+        res.status(500).json({ message: 'Error in calculatepercentageOfStockChange', error }); // Send error response
     }
-    const change = ((currentValue - previousValue) / previousValue) * 100;
-    return change;
 }
 
 

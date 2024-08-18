@@ -5,17 +5,22 @@ const jwt = require('jsonwebtoken');
 //creating new data in database
 const isLocationExists =async (req,res,next) =>{
 
-    const location = req.body.location
+    try{
+        const location = req.body.location
 
-    const getAdminData = await Admin.find()
+        const getAdminData = await Admin.find()
+        
+        const isLocationFound = getAdminData.some(data => data.location === location)
     
-    const isLocationFound = getAdminData.some(data => data.location === location)
-
-    if(isLocationFound){
-        res.status(200).json({message:"Admin already exists for the location",boolean:false})
-    } else {
-        next();
+        if(isLocationFound){
+            res.status(200).json({message:"Admin already exists for the location",boolean:false})
+        } else {
+            next();
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Error checking location existence' });
     }
+
 }
 
 const createAdmin = (req,res)=>{
@@ -90,11 +95,16 @@ const loginAdmin = async (req, res) => {
 };
 
 const getAdminData = async (req,res) =>{
-    const id = req.body.creator
 
-    const AdminDataArray = await Admin.find({_id:id})
-    const {email,name,phone,location} = AdminDataArray[0]
-    return res.status(200).json({email,name,phone,location})
+    const id = req.body.creator
+    try{
+        const AdminDataArray = await Admin.find({_id:id})
+        const {email,name,phone,location} = AdminDataArray[0]
+        return res.status(200).json({email,name,phone,location})
+    } catch {
+        res.status(500).json({ message: 'Server error' });
+    }
+
 }
 
 module.exports = {isLocationExists,createAdmin,deleteAdmin,loginAdmin,hashPassword,getAdminData}
