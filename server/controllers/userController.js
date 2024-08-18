@@ -61,4 +61,4 @@ const loginUser = async (req, res) => {
     }
 };
 
-module.exports = {createUser,deleteUser,loginUser,hashPassword}
+module.exports = {createUser,loginUser,hashPassword}

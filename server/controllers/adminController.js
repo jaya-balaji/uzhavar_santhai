@@ -97,4 +97,4 @@ const getAdminData = async (req,res) =>{
 
 }
 
-module.exports = {isLocationExists,createAdmin,deleteAdmin,loginAdmin,hashPassword,getAdminData}
+module.exports = {isLocationExists,createAdmin,loginAdmin,hashPassword,getAdminData}
