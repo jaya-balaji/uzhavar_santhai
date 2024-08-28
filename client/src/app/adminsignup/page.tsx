@@ -7,12 +7,14 @@ import { useRouter } from "next/navigation";
 
 
 const page = () => {
+
+  const router = useRouter()
+
   const [name,setname] = useState("")
   const [location,setlocation] = useState("")
   const [phone,setphone] = useState("")
   const [email,setemail] = useState("")
   const [password,setpassword] = useState("")
-  const router = useRouter()
   const [message,setmessage] = useState()
   const [showMessage,setshowMessage] = useState(false)
 
@@ -21,7 +23,7 @@ const page = () => {
     axios.post('https://uzhavar-santhai-backend.vercel.app/admin/register',{name,location,phone,email,password})
     .then(res => {
       console.log(res.data.message)
-      if(res.data.boolean){
+      if(!res.data.error){
         router.push(`/adminlogin`);
       } else {
           setmessage(res.data.message)
