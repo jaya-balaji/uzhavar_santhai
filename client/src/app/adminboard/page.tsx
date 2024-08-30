@@ -12,6 +12,8 @@ import CalenderDate from "../Component/Calender";
 import { AiOutlineStock } from "react-icons/ai";
 import { MdOutlineCategory } from "react-icons/md";
 import type { AdminType } from "../../type.d.ts";
+import { useRouter } from "next/navigation";
+
 
 const Page = () => {
   const { id } = useParams();
@@ -37,6 +39,8 @@ const Page = () => {
   );
 
   const totalPages = Math.ceil(fetchedData.length / rowsPerPage);
+  const router = useRouter()
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -206,6 +210,12 @@ const Page = () => {
     }
   };
 
+  const handleLogout = (e : any)=>{
+    e.preventDefault()
+    localStorage.removeItem("token")
+    router.push('/userlogin')
+  }
+
   if (error) {
     return (
       <div className="flex h-screen">
@@ -290,6 +300,9 @@ const Page = () => {
                 {AdminData?.location}
               </span>
             </div>
+          </div>
+          <div>
+            <button onClick={handleLogout} className="bg-gray-800 text-white p-3 rounded-lg">Log out</button>
           </div>
         </div>
       </div>
