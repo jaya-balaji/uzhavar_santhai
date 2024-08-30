@@ -228,7 +228,7 @@ const Page = () => {
             </div>
           </div>
           <div>
-            <button onClick={handleLogout}>Log out</button>
+            <button onClick={handleLogout} className="bg-gray-800 text-white p-3 rounded-lg">Log out</button>
           </div>
         </div>
       </div>
