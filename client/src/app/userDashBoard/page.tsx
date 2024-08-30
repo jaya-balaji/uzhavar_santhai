@@ -9,6 +9,8 @@ import CalenderDate from "../Component/Calender";
 import { AiOutlineStock } from "react-icons/ai";
 import { MdOutlineCategory } from "react-icons/md";
 import type { UserType } from "../../type.d.ts";
+import { useRouter } from "next/navigation";
+
 
 const Page = () => {
   const [fetchedData, setFetchedData] = useState<ItemType[]>([]);
@@ -29,6 +31,7 @@ const Page = () => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [message, setmessage] = useState("No data found");
   const [UserData, setUserData] = useState<UserType | undefined>();
+  const router = useRouter()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -143,6 +146,12 @@ const Page = () => {
     }
   };
 
+  const handleLogout = (e : any)=>{
+    e.preventDefault()
+    localStorage.removeItem("usertoken")
+    router.push('/userlogin')
+  }
+
   if (error) {
     return (
       <div className="flex h-screen">
@@ -217,6 +226,9 @@ const Page = () => {
                 {UserData?.phone}
               </span>
             </div>
+          </div>
+          <div>
+            <button onClick={handleLogout}>Log out</button>
           </div>
         </div>
       </div>
