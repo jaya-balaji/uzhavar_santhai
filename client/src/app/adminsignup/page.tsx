@@ -15,7 +15,7 @@ const page = () => {
   const [phone,setphone] = useState("")
   const [email,setemail] = useState("")
   const [password,setpassword] = useState("")
-  const [message,setmessage] = useState()
+  const [message,setmessage] = useState("")
   const [showMessage,setshowMessage] = useState(false)
 
   const validateEmail=() =>{
