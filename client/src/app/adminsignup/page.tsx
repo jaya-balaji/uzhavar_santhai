@@ -18,26 +18,48 @@ const page = () => {
   const [message,setmessage] = useState()
   const [showMessage,setshowMessage] = useState(false)
 
+  const validateEmail=() =>{
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailPattern.test(email);
+}
+
+const validatePassword=()=> {
+  const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  return passwordPattern.test(password);
+}
+
+
+
+
   const handleSubmit= (e: any) => {
     e.preventDefault()
-    axios.post('https://uzhavar-santhai-backend.vercel.app/admin/register',{name,location,phone,email,password})
-    .then(res => {
-      console.log(res.data.message)
-      if(!res.data.error){
-        router.push(`/adminlogin`);
-      } else {
-          setmessage(res.data.message)
-          setshowMessage(true)
-      }
-})
-.catch(err => console.log(err))
+    if(validateEmail() && validatePassword()){
+      axios.post('https://uzhavar-santhai-backend.vercel.app/admin/register',{name,location,phone,email,password})
+      .then(res => {
+        console.log(res.data.message)
+        if(!res.data.error){
+          router.push(`/adminlogin`);
+        } else {
+            setmessage(res.data.message)
+            // setshowMessage(true)
+        }
+  })
+  .catch(err => console.log(err))
+    }
+
+    if(!validateEmail()){
+      setmessage("Invalid Email")
+    }
+    if(!validatePassword()){
+      setmessage("Invalid Password. Password should Be at least 8 characters long, Include one uppercase letter, one lowercase letter, one number, one special character (e.g., @, #, $, %)")
+    }
   }
 
   return (
     <div className="flex items-center justify-center h-[100vh] background">
-      <form onSubmit={handleSubmit} className="flex flex-col items-center justify-center gap-4 md:gap-8 bg-black p-10 md:p-16 bg-opacity-70 md:w-[70vh]">
+      <form onSubmit={handleSubmit} className="flex flex-col items-center justify-center gap-4 md:gap-8 bg-black p-10 md:p-16 rounded-3xl bg-opacity-70 md:w-[70vh]">
         <div className="text-white">
-          {message}
+          {message?message:""}
         </div>
         <div className="flex flex-row gap-8 justify-between items-center">
           <input type="text" placeholder="Enter Name" className="rounded-sm p-1 md:p-2 md:w-[40vh] w-[25vh] outline-none " onChange={(e)=>setname(e.target.value)}></input>
