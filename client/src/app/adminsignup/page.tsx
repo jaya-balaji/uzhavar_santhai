@@ -57,7 +57,7 @@ const validatePassword=()=> {
 
   return (
     <div className="flex items-center justify-center h-[100vh] background">
-      <form onSubmit={handleSubmit} className="flex flex-col items-center justify-center gap-4 md:gap-8 bg-black p-10 md:p-16 rounded-3xl bg-opacity-70 md:w-[70vh]">
+      <form onSubmit={handleSubmit} className="flex flex-col items-center justify-center gap-4 md:gap-8 bg-black p-10 md:p-12 rounded-3xl bg-opacity-70 md:w-[70vh]">
         <div className="text-white text-xs">
           {message?message:""}
         </div>
