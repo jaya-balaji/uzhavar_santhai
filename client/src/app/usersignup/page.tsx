@@ -12,18 +12,31 @@ const page = () => {
   const [phone,setphone] = useState("")
   const [email,setemail] = useState("")
   const [password,setpassword] = useState("")
+  const [message,setmessage] = useState("")
 
   const handleSubmit= (e: any) => {
     e.preventDefault()
+    if(validateEmail(email) && validatePassword(password)){
     axios.post('https://uzhavar-santhai-backend.vercel.app/user/register',{name,phone,email,password})
     .then(res => {
           router.push(`/userlogin`);
     })
     .catch(err => console.log(err))
   }
+
+    if(!validateEmail(email)){
+      setmessage("Invalid Email")
+    }
+    if(!validatePassword(password)){
+      setmessage("Password should Be at least 8 characters long, Include one uppercase, one lowercase, one number, one special character")
+    }
+  }
   return (
     <div className="flex items-center justify-center h-[100vh] background">
       <form className="flex flex-col items-center justify-center gap-4 md:gap-8 bg-black p-10 md:p-16 rounded-3xl bg-opacity-70 md:w-[70vh]">
+        <div className="text-white text-xs">
+          {message?message:""}
+        </div>
         <div className="flex flex-row gap-8 justify-between items-center">
           <input type="text" placeholder="Enter Name" className="rounded-sm p-1 md:p-2 md:w-[40vh] w-[25vh] outline-none small-placeholder " onChange={(e)=>setname(e.target.value)}></input>
         </div>

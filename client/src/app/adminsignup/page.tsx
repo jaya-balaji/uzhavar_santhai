@@ -18,22 +18,11 @@ const page = () => {
   const [message,setmessage] = useState("")
   const [showMessage,setshowMessage] = useState(false)
 
-  const validateEmail=() =>{
-    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    return emailPattern.test(email);
-}
-
-const validatePassword=()=> {
-  const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-  return passwordPattern.test(password);
-}
-
-
 
 
   const handleSubmit= (e: any) => {
     e.preventDefault()
-    if(validateEmail() && validatePassword()){
+    if(validateEmail(email) && validatePassword(password)){
       axios.post('https://uzhavar-santhai-backend.vercel.app/admin/register',{name,location,phone,email,password})
       .then(res => {
         console.log(res.data.message)
@@ -47,11 +36,11 @@ const validatePassword=()=> {
   .catch(err => console.log(err))
     }
 
-    if(!validateEmail()){
+    if(!validateEmail(email)){
       setmessage("Invalid Email")
     }
-    if(!validatePassword()){
-      setmessage("Invalid Password. Password should Be at least 8 characters long, Include one uppercase letter, one lowercase letter, one number, one special character (e.g., @, #, $, %)")
+    if(!validatePassword(password)){
+      setmessage("Password should Be at least 8 characters long, Include one uppercase, one lowercase, one number, one special character")
     }
   }
 
